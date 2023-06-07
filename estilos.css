@@ -302,3 +302,8 @@ h5 {
 .light h5 {
     color: #C4B0FF;
 }
+
+
+.greeting {
+    text-align: center;
+}
