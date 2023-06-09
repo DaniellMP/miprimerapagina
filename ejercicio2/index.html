@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Tabla Dinámica de Países</title>
+    <style>
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th, td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+      tr:hover {
+        background-color: #f5f5f5;
+      }
+      .input-container {
+        display: flex;
+        margin-bottom: 16px;
+      }
+      .input-container input {
+        flex-grow: 1;
+        margin-right: 8px;
+      }
+      .input-container button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 8px;
+        border: none;
+        cursor: pointer;
+      }
+      .input-container button:hover {
+        background-color: #3e8e41;
+      }
+      .top-buttons {
+        margin-bottom: 16px;
+      }
+      .top-buttons button {
+        background-color: #008CBA;
+        color: white;
+        padding: 8px;
+        border: none;
+        cursor: pointer;
+      }
+      .top-buttons button:hover {
+        background-color: #006d87;
+      }
+    </style>
+</head>
+<body>
+    <div class="top-buttons">
+      <button onclick="resetTable()">Reset</button>
+      <button onclick="saveTable()">Guardar</button>
+    </div>
+    <table id="table">
+      <thead>
+        <tr>
+          <th>Nombre del país</th>
+          <th>Puntaje</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Argentina</td>
+          <td contentEditable="true">500</td>
+        </tr>
+        <tr>
+          <td>Brasil</td>
+          <td contentEditable="true">800</td>
+        </tr>
+        <tr>
+          <td>Chile</td>
+          <td contentEditable="true">300</td>
+        </tr>
+        <tr>
+          <td>México</td>
+          <td contentEditable="true">600</td>
+        </tr>
+        <tr>
+          <td>Perú</td>
+          <td contentEditable="true">400</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="input-container">
+      <input type="text" id="new-country" placeholder="Nombre del país">
+      <input type="number" id="new-score" placeholder="Puntaje" min="1" max="1000">
+      <button onclick="addRow()">Agregar</button>
+    </div>
+    <script>
+      // Define el estado inicial de la tabla como un array de objetos
+      let initialTableState = [
+        { country: 'Argentina', score: 500 },
+        { country: 'Brasil', score: 800 },
+        { country: 'Chile', score: 300 },
+        { country: 'México', score: 600 },
+        { country: 'Perú', score: 400 }
+      ];
+      // Crea una variable para almacenar el estado actual de la tabla
+      let currentTableState = [...initialTableState];
+      // Obtiene la tabla y los inputs de la interfaz
+      let table = document.getElementById('table');
+      let newCountryInput = document.getElementById('new-country');
+      let newScoreInput = document.getElementById('new-score');
+      // Función para agregar una nueva fila a la tabla
+      function addRow() {
+        let newCountry = newCountryInput.value;
+        let newScore = newScoreInput.value;
+        if (newCountry && newScore) {
+          let newRow = document.createElement('tr');
+          newRow.innerHTML = `
+            <td contentEditable="true">${newCountry}</td>
+            <td contentEditable="true">${newScore}</td>
+          `;
+          table.querySelector('tbody').appendChild(newRow);
+          // Actualiza el estado actual de la tabla
+          currentTableState.push({ country: newCountry, score: newScore });
+          // Limpia los inputs
+          newCountryInput.value = '';
+          newScoreInput.value = '';
+        }
+      }
+      // Función para restaurar la tabla a su estado inicial
+      function resetTable() {
+        // Elimina todas las filas adicionales
+        let extraRows = table.querySelectorAll('tbody tr:not(:first-child)');
+        extraRows.forEach(row => row.remove());
+        // Restaura el estado actual de la tabla al estado inicial
+        currentTableState = [...initialTableState];
+        // Actualiza los valores de las celdas de la tabla con el estado inicial
+        let rows = table.querySelectorAll('tbody tr');
+        rows.forEach((row, i) => {
+          row.children[0].textContent = initialTableState[i].country;
+          row.children[1].textContent = initialTableState[i].score;
+        });
+      }
+      // Función para guardar el estado actual de la tabla
+      function saveTable() {
+        // Crea un nuevo estado de la tabla
+        let newTableState = [];
+        let rows = table.querySelectorAll('tbody tr');
+        rows.forEach(row => {
+          let country = row.children[0].textContent;
+          let score = row.children[1].textContent;
+          newTableState.push({ country, score });
+        });
+        // Agrega el nuevo estado de la tabla al historial de estados
+        tableStates.push(newTableState);
+        // Actualiza el menú desplegable con los estados guardados
+        let select = document.createElement('select');
+        select.addEventListener('change', () => {
+          let selectedIndex = select.selectedIndex;
+          currentTableState = tableStates[selectedIndex];
+          let rows = table.querySelectorAll('tbody tr');
+          rows.forEach((row, i) => {
+            row.children[0].textContent = currentTableState[i].country;
+            row.children[1].textContent = currentTableState[i].score;
+          });
+        });
+        tableStates.forEach((state, i) => {
+          let option = document.createElement('option');
+          option.textContent = `Versión ${i + 1}`;
+          select.appendChild(option);
+        });
+        let topButtons = document.querySelector('.top-buttons');
+        topButtons.appendChild(select);
+      }
+      // Crea un array para almacenar el historial de estados de la tabla
+      let tableStates = [currentTableState];
+    </script>
+</body>
+</html>

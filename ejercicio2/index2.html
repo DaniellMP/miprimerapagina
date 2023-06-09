@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Tabla Dinámica de Países</title>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th, td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+        cursor: pointer;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+      tr:hover {
+        background-color: #f5f5f5;
+      }
+      .input-container {
+        display: flex;
+        margin-bottom: 16px;
+      }
+      .input-container input {
+        flex-grow: 1;
+        margin-right: 8px;
+      }
+      .input-container button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 8px;
+        border: none;
+        cursor: pointer;
+      }
+      .input-container button:hover {
+        background-color: #3e8e41;
+      }
+      .top-buttons {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        margin-bottom: 16px;
+      }
+      .top-buttons button {
+        background-color: #008CBA;
+        color: white;
+        padding: 8px;
+        border: none;
+        cursor: pointer;
+      }
+      .top-buttons button:hover {
+        background-color: #006d87;
+      }
+      .bottom-buttons {
+        display: flex;
+        justify-content: flex-end;
+        width: 100%;
+        margin-top: 16px;
+      }
+    </style>
+</head>
+<body>
+    <div class="top-buttons">
+      <button onclick="resetTable()">Reset</button>
+      <button onclick="saveTable()">Guardar</button>
+    </div>
+    <table id="table">
+      <thead>
+        <tr>
+          <th onclick="sortTable(0)">Nombre del país</th>
+          <th onclick="sortTable(1)">Puntaje</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Argentina</td>
+          <td contentEditable="true">500</td>
+        </tr>
+        <tr>
+          <td>Brasil</td>
+          <td contentEditable="true">800</td>
+        </tr>
+        <tr>
+          <td>Chile</td>
+          <td contentEditable="true">300</td>
+        </tr>
+        <tr>
+          <td>México</td>
+          <td contentEditable="true">600</td>
+        </tr>
+        <tr>
+          <td>Perú</td>
+          <td contentEditable="true">400</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="bottom-buttons">
+      <div class="input-container">
+        <input type="text" id="new-country" placeholder="Nombre del país">
+        <input type="number" id="new-score" placeholder="Puntaje" min="1" max="1000">
+        <button onclick="addRow()">Agregar</button>
+      </div>
+      <button id="start-stop-button" onclick="startStop()">Iniciar</button>
+    </div>
+    <script>
+      // Define el estado inicial de la tabla como un array de objetos
+      let initialTableState = [
+        { country: 'Argentina', score: 500 },
+        { country: 'Brasil', score: 800 },
+        { country: 'Chile', score: 300 },
+        { country: 'México', score: 600 },
+        { country: 'Perú', score: 400 }
+      ];
+      // Crea una variable para almacenar el estado actual de la tabla
+      let currentTableState = [...initialTableState];
+      // Obtiene la tabla y los inputs de la interfaz
+      let table = document.getElementById('table');
+      let newCountryInput = document.getElementById('new-country');
+      let newScoreInput = document.getElementById('new-score');
+      // Función para agregar una nueva fila a la tabla
+      function addRow() {
+        let newCountry = newCountryInput.value;
+        let newScore = newScoreInput.value;
+        if (newCountry && newScore) {
+          let newRow = document.createElement('tr');
+          newRow.innerHTML = `
+            <td contentEditable="true">${newCountry}</td>
+            <td contentEditable="true">${newScore}</td          `;
+          table.querySelector('tbody').appendChild(newRow);
+          newCountryInput.value = '';
+          newScoreInput.value = '';
+          currentTableState.push({ country: newCountry, score: newScore });
+        } else {
+          alert('Por favor completa ambos campos.');
+        }
+      }
+      // Función para reiniciar la tabla al estado inicial
+      function resetTable() {
+        currentTableState = [...initialTableState];
+        renderTable(currentTableState);
+      }
+      // Función para guardar el estado actual de la tabla
+      function saveTable() {
+        alert('Guardado exitosamente.');
+      }
+      // Función para ordenar la tabla por una columna dada
+      function sortTable(column) {
+        currentTableState.sort((a, b) => a[Object.keys(a)[column]] - b[Object.keys(b)[column]]);
+        renderTable(currentTableState);
+      }
+      // Función para iniciar o detener la animación
+      function startStop() {
+        let startStopButton = document.getElementById('start-stop-button');
+        if (startStopButton.textContent === 'Iniciar') {
+          startStopButton.textContent = 'Detener';
+        } else {
+          startStopButton.textContent = 'Iniciar';
+        }
+      }
+      // Función para renderizar la tabla a partir de un estado dado
+      function renderTable(state) {
+        let tbody = table.querySelector('tbody');
+        tbody.innerHTML = '';
+        for (let i = 0; i < state.length; i++) {
+          let row = document.createElement('tr');
+          row.innerHTML = `
+            <td contentEditable="true">${state[i].country}</td>
+            <td contentEditable="true">${state[i].score}</td>
+          `;
+          tbody.appendChild(row);
+        }
+      }
+      // Renderiza la tabla con el estado inicial al cargar la página
+      renderTable(currentTableState);
+    </script>
+</body>
+</html>
